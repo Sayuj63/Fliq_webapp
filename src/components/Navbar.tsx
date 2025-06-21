@@ -37,7 +37,21 @@ const navItems = [
   { href: "/essay", label: "Essay" },
 ];
 
+import { useUser } from '@clerk/nextjs';
+
+
 export default function Navbar() {
+  const { isSignedIn } = useUser();
+
+  useEffect(() => {
+    if (isSignedIn) {
+      fetch('/api/application', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => console.log('[Client] Sync result:', data))
+        .catch(err => console.error('[Client] Sync error:', err));
+    }
+  }, [isSignedIn]);
+
   const router = useRouter();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -17,12 +17,10 @@ declare global {
   var mongoose: MongooseCache | undefined;
 }
 
-type GlobalWithMongooseCache = typeof globalThis & { mongoose?: MongooseCache };
-const globalWithCache = global as GlobalWithMongooseCache;
-const cached: MongooseCache = globalWithCache.mongoose || { conn: null, promise: null };
+const cached: MongooseCache = (global as any).mongoose || { conn: null, promise: null };
 
-if (!globalWithCache.mongoose) {
-  globalWithCache.mongoose = cached;
+if (!(global as any).mongoose) {
+  (global as any).mongoose = cached;
 }
 
 async function connectDB() {
