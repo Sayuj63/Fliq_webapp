@@ -12,13 +12,17 @@ type MongooseCache = {
 };
 
 declare global {
+  // Extend NodeJS.Global to include mongoose for caching
+  // eslint-disable-next-line no-var
   var mongoose: MongooseCache | undefined;
 }
 
-let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
+type GlobalWithMongooseCache = typeof globalThis & { mongoose?: MongooseCache };
+const globalWithCache = global as GlobalWithMongooseCache;
+const cached: MongooseCache = globalWithCache.mongoose || { conn: null, promise: null };
 
-if (!global.mongoose) {
-  global.mongoose = cached;
+if (!globalWithCache.mongoose) {
+  globalWithCache.mongoose = cached;
 }
 
 async function connectDB() {

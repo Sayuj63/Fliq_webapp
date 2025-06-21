@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+
 
 interface CollegeCardProps {
   name: string;
@@ -33,7 +33,7 @@ const CollegeInfoCard: React.FC<CollegeInfoCardProps> = ({ name, match, type }) 
   </div>
 );
 
-const CollegeCard: React.FC<CollegeCardProps> = ({ name, rank, match, isPremium = false }) => (
+const CollegeCard: React.FC<CollegeCardProps> = ({ name, rank, match }) => (
   <div className="w-64 flex-shrink-0 overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
     {/* Image Placeholder - seamless, no box */}
     <div className="h-32 w-full bg-gray-700 flex items-center justify-center text-gray-400">
@@ -78,18 +78,7 @@ const HomePage: React.FC = () => {
     { name: 'University of Illinois at Urbana-Champaign', match: '93%', type: 'Safety' },
   ];
 
-  const reachColleges: Array<{name: string, match: string, type: 'Target' | 'Safety' | 'Reach'}> = [
-    { name: 'University of Texas at Austin', match: '88%', type: 'Reach' },
-    { name: 'University of Illinois at Urbana-Champaign', match: '82%', type: 'Reach' },
-    { name: 'Georgia Institute of Technology', match: '85%', type: 'Reach' },
-    { name: 'Cornell University', match: '78%', type: 'Reach' },
-    { name: 'Duke University', match: '80%', type: 'Reach' },
-    { name: 'Northwestern University', match: '75%', type: 'Reach' },
-    { name: 'Johns Hopkins University', match: '72%', type: 'Reach' },
-    { name: 'Brown University', match: '70%', type: 'Reach' },
-    { name: 'Dartmouth College', match: '68%', type: 'Reach' },
-    { name: 'Vanderbilt University', match: '65%', type: 'Reach' },
-  ];
+  
 
   const moreColleges = [
     'Purdue University',

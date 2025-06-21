@@ -54,7 +54,7 @@ export default function ApplicationFormPage() {
 
         {step === 1 && (
           <form className="space-y-6 max-w-3xl mx-auto py-12">
-            <h2 className="text-2xl font-bold text-center mb-8">Let's get to know you</h2>
+            <h2 className="text-2xl font-bold text-center mb-8">Let&apos;s get to know you</h2>
             
             <div className="space-y-6">
               <div className="space-y-6">

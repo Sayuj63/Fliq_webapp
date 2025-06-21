@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 
 const RoadmapPage = () => {
   const roadmaps = [
@@ -103,10 +104,13 @@ const RoadmapPage = () => {
                 </div>
                 {/* University logo/image on mobile */}
                 <div className="sm:hidden w-16 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                  <img 
-                    src={roadmap.image} 
+                  <Image
+                    src={roadmap.image}
                     alt={roadmap.university}
                     className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                    style={{ objectFit: 'cover' }}
                   />
                 </div>
               </div>
@@ -133,10 +137,13 @@ const RoadmapPage = () => {
             
             {/* University logo/image on desktop */}
             <div className="hidden sm:block w-32 h-24 rounded-lg overflow-hidden flex-shrink-0 order-1 sm:order-2">
-              <img 
-                src={roadmap.image} 
+              <Image
+                src={roadmap.image}
                 alt={roadmap.university}
                 className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 640px) 100vw, 33vw"
+                style={{ objectFit: 'cover' }}
               />
             </div>
           </div>
