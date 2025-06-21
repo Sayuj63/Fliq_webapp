@@ -34,24 +34,24 @@ const CollegeInfoCard: React.FC<CollegeInfoCardProps> = ({ name, match, type }) 
 );
 
 const CollegeCard: React.FC<CollegeCardProps> = ({ name, rank, match, isPremium = false }) => (
-  <div className="bg-[#1e2125] rounded-xl p-4 w-64 flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-    {/* Image Placeholder */}
-    <div className="bg-gray-700 rounded-lg h-32 mb-3 overflow-hidden">
-      <div className="w-full h-full flex items-center justify-center text-gray-400">
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
+  <div className="w-64 flex-shrink-0 overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+    {/* Image Placeholder - seamless, no box */}
+    <div className="h-32 w-full bg-gray-700 flex items-center justify-center text-gray-400">
+      <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    </div>
+    {/* Box only around text and button */}
+    <div className="bg-[#1e2125] p-4">
+      <h3 className="text-white font-medium text-base truncate">{name}</h3>
+      <div className="flex justify-between items-center mt-1">
+        <p className="text-gray-400 text-sm">{rank}</p>
+        <p className="text-blue-400 text-sm font-medium">Match: {match}</p>
       </div>
+      <button className="mt-3 w-full bg-[#293039] hover:bg-[#334155] text-white py-2.5 rounded-full text-sm font-medium transition-colors">
+        View Roadmap
+      </button>
     </div>
-    
-    <h3 className="text-white font-medium text-base truncate">{name}</h3>
-    <div className="flex justify-between items-center mt-1">
-      <p className="text-gray-400 text-sm">{rank}</p>
-      <p className="text-blue-400 text-sm font-medium">Match: {match}</p>
-    </div>
-    <button className="mt-3 w-full bg-[#293039] hover:bg-[#334155] text-white py-2.5 rounded-full text-sm font-medium transition-colors">
-      View Roadmap
-    </button>
   </div>
 );
 

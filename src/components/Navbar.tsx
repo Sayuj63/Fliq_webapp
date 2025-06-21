@@ -86,13 +86,6 @@ export default function Navbar() {
         <div className="flex items-center justify-between">
           {/* Logo and Mobile Menu Button */}
           <div className="flex items-center justify-between w-full md:w-auto">
-            <h1 
-              className="text-2xl font-bold text-white cursor-pointer ml-4 md:ml-6"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-              onClick={(e) => handleNavigation(e, '/')}
-            >
-              Fliq
-            </h1>
 
             {/* Mobile menu button */}
             <div className="md:hidden">
@@ -112,7 +105,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center justify-center space-x-10 w-full">
             {navItems.map((item) => (
               <NavItem 
                 key={item.href}
