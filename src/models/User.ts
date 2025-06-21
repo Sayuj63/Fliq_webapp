@@ -13,8 +13,7 @@ const userSchema = new mongoose.Schema({
   },
   firstName: String,
   lastName: String,
-  phone: String,
-  address: String,
+
   createdAt: {
     type: Date,
     default: Date.now,
