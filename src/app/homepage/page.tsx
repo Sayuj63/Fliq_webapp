@@ -196,11 +196,11 @@ const HomePage: React.FC = () => {
               return (
                 <div
                   key={college.name}
-                  className="bg-[#1e2125] flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 min-w-[200px] max-w-[256px] w-full rounded-[24px]"
-                  style={{height: '320px', borderRadius: '24px'}}>
-                  <div className="w-full overflow-hidden rounded-t-[24px]" style={{height: '160px'}}>
+                  className="bg-[#1e2125] flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 min-w-[280px] max-w-[340px] w-full rounded-[24px]"
+                  style={{height: '220px', borderRadius: '24px'}}>
+                  <div className="w-full overflow-hidden rounded-t-[24px]" style={{height: '100px'}}>
                     <div className="w-full h-full flex items-center justify-center">
-                      <div className="relative w-full h-full" style={{height: '160px'}}>
+                      <div className="relative w-full h-full" style={{height: '100px'}}>
                         <Image
                           src={randomImage}
                           alt={college.name}
