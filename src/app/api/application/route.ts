@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     const { userId } = auth;
 
     // Get the actual Clerk client instance
+    // Get the actual Clerk client instance
     const clerk = await clerkClient();
 
     // Check that clerk is valid before calling getUser
@@ -33,10 +34,11 @@ export async function POST(req: NextRequest) {
     try {
       console.log('[API] Fetching Clerk user data...');
       clerkUser = await clerk.users.getUser(userId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[API] Clerk user fetch failed:', err);
+      const message = typeof err === 'object' && err && 'message' in err ? (err as { message?: string }).message : String(err);
       return new Response(
-        JSON.stringify({ error: 'Clerk user fetch failed', details: err.message }),
+        JSON.stringify({ error: 'Clerk user fetch failed', details: message }),
         { status: 500 }
       );
     }
@@ -65,10 +67,11 @@ export async function POST(req: NextRequest) {
           setDefaultsOnInsert: true,
         }
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[API] MongoDB upsert failed:', err);
+      const message = typeof err === 'object' && err && 'message' in err ? (err as { message?: string }).message : String(err);
       return new Response(
-        JSON.stringify({ error: 'MongoDB upsert failed', details: err.message }),
+        JSON.stringify({ error: 'MongoDB upsert failed', details: message }),
         { status: 500 }
       );
     }
@@ -80,9 +83,10 @@ export async function POST(req: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[API] Unexpected server error:', error);
-    return new Response(JSON.stringify({ error: error.message || 'Unknown error' }), {
+    const message = typeof error === 'object' && error && 'message' in error ? (error as { message?: string }).message : String(error);
+    return new Response(JSON.stringify({ error: message || 'Unknown error' }), {
       status: 500,
     });
   }

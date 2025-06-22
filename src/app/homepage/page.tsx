@@ -191,7 +191,7 @@ const HomePage: React.FC = () => {
                 match: '66%',
                 type: 'Reach',
               },
-            ].map((college, idx) => {
+            ].map((college) => {
               const randomImage = images[Math.floor(Math.random() * images.length)];
               return (
                 <div
