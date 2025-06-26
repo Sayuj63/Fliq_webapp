@@ -30,11 +30,11 @@ const NavItem = ({
 );
 
 const navItems = [
-  { href: "/", label: "Home" },
+  { href: "/", label: "Discovery" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/scholarship", label: "Scholarship" },
   { href: "/mentorkonnect", label: "Mentorkonnect" },
-  { href: "/essay", label: "Essay" },
+  { href: "/EssayHelper", label: "Essay Builder" },
 ];
 
 import { useUser } from '@clerk/nextjs';

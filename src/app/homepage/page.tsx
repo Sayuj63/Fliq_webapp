@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image, { StaticImageData } from 'next/image';
 
 import img1 from '@/assets/2a1713375a9fcca98c14854fdc073ad10a805252.png';
@@ -123,9 +123,29 @@ const HomePage: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Recommended Colleges */}
         <section className="mb-12">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-white">Recommended Colleges</h2>
-            <button className="text-blue-400 text-sm font-medium hover:underline">View All</button>
+          <div className="mb-4">
+            <div className="flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-white">Smart matches</h2>
+              <div className="relative group">
+                <button 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  aria-label="How these matches are built"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                  </svg>
+                </button>
+                <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-gray-800 text-white text-sm rounded-lg shadow-lg p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <h3 className="font-bold text-white mb-2">How These Matches Are Built</h3>
+                  <p className="text-gray-300">
+                    We use your GPA, intended major, financial preferences, and 40+ personal signals to generate a ranked match list using verified admit data from real universities and 5,000+ successful applications. These aren't guesses — they're strategy-backed insights.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-300 text-sm mt-1">
+              Backed by 5,000+ successful applications and real admit data — Fliq builds your list using verified university insights, not just random rankings.
+            </p>
           </div>
           <div className="relative">
             <div className="flex space-x-4 pb-4 overflow-x-auto scrollbar-hide">
@@ -144,10 +164,7 @@ const HomePage: React.FC = () => {
 
         {/* Target & Safety Schools */}
         <section className="mb-12">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-white">Target & Safety Schools</h2>
-            <button className="text-blue-400 text-sm font-medium hover:underline">View All</button>
-          </div>
+          <h2 className="text-2xl font-bold text-white mb-4">Target & Safety Schools</h2>
           <div className="relative">
             <div className="flex space-x-8 pb-4 overflow-x-auto scrollbar-hide px-4">
               {targetSafetyColleges.map((college, index) => {
@@ -227,12 +244,7 @@ const HomePage: React.FC = () => {
         {/* Explore More Colleges */}
         <section className="mb-12">
           <div className="flex flex-col gap-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-white">Explore More Colleges</h2>
-              <button className="text-blue-400 text-sm font-medium hover:underline">
-                View All
-              </button>
-            </div>
+            <h2 className="text-2xl font-bold text-white mb-4">Explore More Colleges</h2>
             
             <div className="flex flex-wrap items-center gap-2">
               <select className="bg-[#1e2125] text-white text-xs rounded-full px-4 py-1.5 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent h-8">
