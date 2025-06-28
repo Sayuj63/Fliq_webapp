@@ -59,49 +59,97 @@ const CollegeInfoCard: React.FC<CollegeInfoCardProps> = ({ name, match, type, im
   </div>
 );
 
-const CollegeCard: React.FC<CollegeCardProps> = ({ name, rank, match, imageUrl, type = 'Target' }) => (
-  <div className="w-64 flex-shrink-0 overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-black border border-gray-800">
-    {/* College Image */}
-    <div className="h-40 w-full bg-gray-900 flex items-center justify-center overflow-hidden">
-      <Image 
-        src={imageUrl} 
-        alt={name} 
-        className="object-cover w-full h-full"
-        width={256}
-        height={160}
-      />
-    </div>
-    
-    {/* College Info */}
-    <div className="p-4">
-      <div className="flex justify-between items-start mb-1">
-        <div className="flex items-center">
-          <span className="text-xl font-bold text-white">{match.replace('%', '')}</span>
-          <span className="text-xs text-gray-400 ml-0.5">%</span>
-          <span className="text-xs text-gray-400 ml-0.5">match</span>
+const CollegeCard: React.FC<CollegeCardProps> = ({ name, rank, match, imageUrl, type = 'Target' }) => {
+  // Extract the main part of the university name (before the first comma or parenthesis)
+  const displayName = name.split(',')[0].split('(')[0].trim();
+  const isLongName = displayName.length > 20;
+  
+  return (
+    <div className="w-72 flex-shrink-0 bg-gradient-to-b from-gray-900 to-gray-950 rounded-2xl overflow-hidden border border-gray-800 hover:border-gray-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
+      {/* College Image */}
+      <div className="h-40 w-full bg-gray-900 relative overflow-hidden">
+        <Image 
+          src={imageUrl} 
+          alt={name} 
+          fill
+          className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        
+        {/* Match Badge */}
+        <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center">
+          <span className="text-blue-400 font-bold text-sm">{match.replace('%', '')}</span>
+          <span className="text-blue-300 text-xs ml-0.5">%</span>
+          <span className="text-gray-300 text-xs ml-1">match</span>
         </div>
-        <div className="text-gray-400 hover:text-white transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
-          </svg>
-        </div>
-      </div>
-      
-      <h3 className="text-white font-medium text-sm mb-1 line-clamp-2" style={{ height: '2.25rem' }}>{name}</h3>
-      
-      <div className="flex justify-between items-center mt-1">
-        <p className="text-gray-400 text-xs">{rank}</p>
+        
+        {/* Type Badge */}
         {type !== 'Safety' && (
-          <span className={`text-[10px] font-medium ${
-            type === 'Target' ? 'text-yellow-400' : 'text-gray-400'
+          <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${
+            type === 'Target' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-800/90 text-gray-300'
           }`}>
             {type}
-          </span>
+          </div>
         )}
       </div>
+      
+      {/* College Info */}
+      <div className="p-5">
+        {/* University Name */}
+        <h3 
+          className={`font-bold text-white mb-2 leading-tight ${
+            isLongName ? 'text-xl' : 'text-2xl'
+          }`}
+          style={{
+            fontFamily: 'var(--font-geist-sans), system-ui, -apple-system, sans-serif',
+            fontWeight: 700,
+            letterSpacing: '-0.01em',
+            lineHeight: '1.2'
+          }}
+        >
+          {displayName}
+        </h3>
+        
+        {/* University Location */}
+        <p className="text-gray-400 text-sm mb-4">
+          {name.includes('(') ? name.split('(')[1].replace(')', '') : 'United States'}
+        </p>
+        
+        {/* Rank and Action */}
+        <div className="flex justify-between items-center pt-3 border-t border-gray-800">
+          <div className="flex items-center">
+            <span className="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded">
+              {rank}
+            </span>
+          </div>
+          
+          <button 
+            className="text-blue-400 hover:text-blue-300 transition-colors flex items-center group"
+            aria-label="View details"
+          >
+            <span className="text-sm font-medium mr-1">View</span>
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              className="group-hover:translate-x-0.5 transition-transform"
+            >
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // List of top 10 colleges for the dropdown
 const topColleges = [
@@ -352,7 +400,7 @@ const HomePage: React.FC = () => {
         </section>
 
         {/* Explore More Colleges */}
-        <section className="mb-12">
+        {/* <section className="mb-12">
           <div className="flex flex-col gap-6">
           <div className="text-center max-w-3xl mx-auto mb-10">
             <h2 className="text-3xl font-bold text-white mb-4">Just Outside Your Comfort Zone</h2>
@@ -376,7 +424,7 @@ const HomePage: React.FC = () => {
   );
 })}
           </div>
-        </section>
+        </section> */}
 
 
       </main>
