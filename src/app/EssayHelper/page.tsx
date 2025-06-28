@@ -1,14 +1,21 @@
 "use client";
-import React, { useState, useRef } from "react";
-import { formatFeedback } from "./formatFeedback";
+import React, { useState } from "react";
+import dynamic from 'next/dynamic';
+
+const RightColumnVisuals = dynamic(
+  () => import('@/components/RightColumnVisuals'),
+  { ssr: false }
+);
 
 const commonAppPrompts = [
-  "1. Background, identity, interest, or talent.",
-  "2. Lesson from obstacles.",
-  "3. Challenging a belief or idea.",
-  "4. Problem solved or problem you'd like to solve.",
-  "5. Accomplishment or realization that sparked growth.",
-  "6. Topic, idea, or concept you find engaging."
+  "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it. If this sounds like you, then please share your story.",
+  "The lessons we take from obstacles we encounter can be fundamental to later success. Recount a time when you faced a challenge, setback, or failure. How did it affect you, and what did you learn from the experience?",
+  "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?",
+  "Reflect on something that someone has done for you that has made you happy or thankful in a surprising way. How has this gratitude affected or motivated you?",
+  "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
+  "Describe a topic, idea, or concept you find so engaging that it makes you lose all track of time. Why does it captivate you? What or who do you turn to when you want to learn more?",
+  "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design.",
+  "+ Add supplement question"
 ];
 
 function wordCount(text: string) {
@@ -22,10 +29,8 @@ const EssayHelperPage: React.FC = () => {
   const [essay, setEssay] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [feedback, setFeedback] = useState<string>("");
-  const [formattedFeedback, setFormattedFeedback] = useState<Array<{ label: string, bullets: string[] }>>([]);
   const [touched, setTouched] = useState<boolean>(false);
-  const responseRef = useRef<HTMLDivElement>(null);
+  const [hasSubmitted, setHasSubmitted] = useState<boolean>(false);
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setPromptIndex(Number(e.target.value));
@@ -33,143 +38,139 @@ const EssayHelperPage: React.FC = () => {
 
   const handleEssayChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEssay(e.target.value);
-    setTouched(true);
     setError("");
-    setFeedback("");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setFeedback("");
     if (!essay.trim()) {
-      setError("Please enter your essay text.");
+      setError("Please enter your essay before submitting.");
       return;
     }
-    if (wordCount(essay) < 100) {
-      setError("Essay is too short. Please provide at least 100 words.");
-      return;
-    }
+    
     setLoading(true);
-    try {
-      const res = await fetch("/api/essay-feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ essay, prompt: commonAppPrompts[promptIndex] })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Something went wrong.");
-        setFeedback("");
-      } else {
-        const content = data.result?.choices?.[0]?.message?.content || "No feedback received.";
-        setFeedback(content);
-        setFormattedFeedback(formatFeedback(content));
-        setTimeout(() => {
-          responseRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 200);
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Unknown error.");
-      }
-    } finally {
+    setError("");
+    setHasSubmitted(true);
+    
+    // Here you would typically make an API call to analyze the essay
+    // For now, we'll just simulate a short delay
+    setTimeout(() => {
       setLoading(false);
-    }
+    }, 1000);
   };
-
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center py-10 px-4">
-      <div className="w-full max-w-2xl flex flex-col gap-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 tracking-tight">Essay Builder</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 bg-zinc-900/80 rounded-2xl shadow-lg p-6 md:p-8 border border-zinc-800">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="prompt" className="font-semibold text-base mb-1">Common App Prompt</label>
+      <div className="w-[1400px] flex flex-col gap-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-medium mb-1">Let's Check Your Essay</h1>
+          <p className="text-sm text-white/80">Essay Builder/Checker</p>
+        </div>
+        
+        <div className="flex justify-between w-full">
+          {/* Left Column - Wider */}
+          <div className="w-[900px] bg-black border border-white/10 rounded-2xl p-8 flex flex-col">
+            <h2 className="text-sm font-medium mb-2">Common App Prompt</h2>
+            <p className="text-sm text-white/60 mb-4">You can manually type too, select 'Other' if not found.</p>
+            
             <select
               id="prompt"
-              className="bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-white/40"
+              className="w-full p-3 bg-black border border-white/10 rounded-lg text-sm text-white focus:outline-none mb-6"
               value={promptIndex}
               onChange={handlePromptChange}
             >
               {commonAppPrompts.map((prompt, i) => (
-                <option key={i} value={i} className="bg-zinc-900 text-white">{prompt}</option>
+                <option key={i} value={i} className="bg-black text-white">{prompt}</option>
               ))}
             </select>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="essay" className="font-semibold text-base mb-1">Your Essay</label>
-            <textarea
-              id="essay"
-              className="resize-vertical min-h-[200px] bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-white/40 placeholder:text-zinc-400 placeholder:opacity-80"
-              placeholder="Paste or type your essay here..."
-              value={essay}
-              onChange={handleEssayChange}
-              rows={8}
-              spellCheck={true}
-              autoCorrect="on"
-              autoFocus
-              disabled={loading}
-              style={{ fontFamily: 'inherit', fontSize: '1.08rem' }}
-            />
-            <div className="flex justify-between text-xs text-zinc-400 mt-1">
-              <span>Word count: {wordCount(essay)}</span>
-              {touched && wordCount(essay) < 100 && (
-                <span className="text-red-400">Essay must be at least 100 words.</span>
+            
+            <h2 className="text-sm font-medium mb-3">Your Essay</h2>
+            <div className="flex-1 flex flex-col">
+              <div className="w-full h-[289px] border border-white/20 rounded-lg overflow-hidden">
+                <textarea
+                  id="essay"
+                  className="w-full h-full p-4 bg-black text-white placeholder-white/30 text-sm focus:outline-none resize-none"
+                  placeholder="Paste/type your essay here.."
+                  value={essay}
+                  onChange={handleEssayChange}
+                  spellCheck={true}
+                  autoCorrect="on"
+                  autoFocus
+                  disabled={loading}
+                  style={{ lineHeight: '1.5' }}
+                />
+              </div>
+              <div className="mt-4 flex justify-between items-center">
+                <span className="text-sm text-white/60">{wordCount(essay)} words</span>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={loading || wordCount(essay) < 100}
+                  className={`px-5 py-2 rounded-lg text-sm ${
+                    loading || wordCount(essay) < 100 
+                      ? 'bg-white/5 text-white/30 cursor-not-allowed' 
+                      : 'bg-white text-black hover:bg-white/90'
+                  }`}
+                >
+                  {loading ? 'Analyzing...' : 'Submit'}
+                </button>
+              </div>
+              {error && (
+                <div className="mt-2 text-red-400 text-sm" role="alert">{error}</div>
               )}
             </div>
           </div>
-          <button
-            type="submit"
-            className={`mt-2 w-full py-3 rounded-lg font-semibold text-lg bg-white text-black shadow-md border-2 border-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/60 hover:bg-black hover:text-white hover:border-neutral-300 hover:shadow-[0_0_16px_2px_rgba(255,255,255,0.2)] ${loading ? 'opacity-70 cursor-not-allowed animate-pulse' : ''}`}
-            disabled={loading}
-          >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5 text-black dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
-                Analyzing...
-              </span>
-            ) : (
-              "Submit Essay"
-            )}
-          </button>
-          {error && (
-            <div className="mt-1 text-red-400 text-sm font-medium" role="alert">{error}</div>
-          )}
-        </form>
-        {feedback && (
-          <div
-            ref={responseRef}
-            className={`bg-zinc-900/90 border border-zinc-800 rounded-2xl shadow-lg p-6 md:p-8 mt-2 ${fadeIn}`}
-            style={{ animationName: 'fadeIn', animationDuration: '0.7s', animationTimingFunction: 'ease' }}
-          >
-            <h2 className="text-2xl font-bold mb-5 tracking-tight">AI Suggestions</h2>
-            {formattedFeedback && formattedFeedback.length > 0 ? (
-              <div className="max-w-prose space-y-7">
-                {formattedFeedback.map(({ label, bullets }) => (
-                  <div key={label}>
-                    <h3 className="font-semibold text-lg mb-2 text-white/90">{label}</h3>
-                    <ul className="list-disc pl-6 text-base leading-relaxed space-y-2">
-                      {bullets.map((b, i) => (
-                        <li key={i} className="text-zinc-100">{b}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+          
+          {/* Right Column - Visual Feedback */}
+          <div className="w-[450px] bg-black border border-white/10 rounded-2xl p-6 overflow-y-auto">
+            {!hasSubmitted ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6">
+                <div className="text-white/60 mb-2">Submit your essay to see the analysis</div>
+                <div className="text-xs text-white/40">Your feedback will appear here</div>
+              </div>
+            ) : loading ? (
+              <div className="h-full flex flex-col items-center justify-center">
+                <div className="text-white/80 mb-2">Analyzing your essay</div>
+                <div className="text-sm text-white/60 mb-4">This may take a moment...</div>
+                <div className="w-3/4 bg-white/10 rounded-full h-1.5 overflow-hidden">
+                  <div className="bg-blue-500 h-full animate-pulse" style={{ width: '70%' }}></div>
+                </div>
               </div>
             ) : (
-              <pre className="whitespace-pre-wrap bg-zinc-950/70 border border-zinc-800 rounded-lg text-base text-zinc-100 px-4 py-3 overflow-x-auto" style={{fontFamily: 'inherit'}}>{feedback}</pre>
+              <RightColumnVisuals essay={essay} loading={false} />
             )}
           </div>
-        )}
+        </div>
       </div>
       {/* FadeIn keyframes for Tailwind */}
-      <style>{`
+      <style jsx global>{`
+        @font-face {
+          font-family: 'Geist';
+          src: url('/fonts/Geist/Geist-Regular.woff2') format('woff2');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+        @font-face {
+          font-family: 'Geist';
+          src: url('/fonts/Geist/Geist-Medium.woff2') format('woff2');
+          font-weight: 500;
+          font-style: normal;
+          font-display: swap;
+        }
+        @font-face {
+          font-family: 'Geist';
+          src: url('/fonts/Geist/Geist-Bold.woff2') format('woff2');
+          font-weight: bold;
+          font-style: normal;
+          font-display: swap;
+        }
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(24px); }
+          from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: none; }
+        }
+        body {
+          font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
       `}</style>
     </div>

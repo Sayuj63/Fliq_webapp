@@ -33,7 +33,7 @@ const navItems = [
   { href: "/", label: "Discovery" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/scholarship", label: "Scholarship" },
-  { href: "/mentorkonnect", label: "Mentorkonnect" },
+  { href: "/mentors", label: "Mentorkonnect" },
   { href: "/EssayHelper", label: "Essay Builder" },
 ];
 
@@ -93,7 +93,7 @@ export default function Navbar() {
   }, [isMenuOpen]);
 
   return (
-    <nav className={`sticky top-0 z-50 bg-[#121417] border-b border-[#1a1d21] transition-all duration-300 ${
+    <nav className={`sticky top-0 z-50 bg-[#09090B] border-b border-[#1a1d21] transition-all duration-300 ${
       isScrolled ? 'py-2' : 'py-3'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

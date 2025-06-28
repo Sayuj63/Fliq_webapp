@@ -2,29 +2,58 @@
 
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+const navigation = [
+  { name: 'Profile', href: '/profile' },
+  { name: 'Preferences', href: '/profile/preferences' },
+  { name: 'Calendar', href: '/profile/calendar' },
+];
+
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ');
+}
 
 export default function ProfilePage() {
-  const { user } = useUser();
-  const [activeTab, setActiveTab] = useState('basic');
+  const { isLoaded, user } = useUser();
+  const pathname = usePathname();
+  
+  // Show loading state while Clerk is initializing
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+  
+  // If user is not signed in, redirect to sign-in page
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Please sign in to view your profile</h2>
+          <a 
+            href="/sign-in" 
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Sign In
+          </a>
+        </div>
+      </div>
+    );
+  }
+  
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
+    username: user?.username || '',
+    name: user?.fullName || '',
     email: user?.primaryEmailAddress?.emailAddress || '',
-    phone: '',
-    location: '',
-    gender: '',
-    dob: '',
-    bio: '',
-    educationLevel: '',
-    fieldOfStudy: '',
-    graduationYear: '',
-    gpa: '',
-    testScores: '',
-    extracurriculars: '',
-    workExperience: ''
+    bio: 'I own a computer.',
+    portfolioLinks: ['']
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -32,185 +61,219 @@ export default function ProfilePage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
+  const addPortfolioLink = () => {
+    setFormData(prev => ({
+      ...prev,
+      portfolioLinks: [...prev.portfolioLinks, '']
+    }));
   };
 
-  const resetToDefault = () => {
-    // Reset form to default values
-    setFormData({
-      ...formData,
-      phone: '',
-      location: '',
-      gender: '',
-      dob: '',
-      bio: '',
-      educationLevel: '',
-      fieldOfStudy: '',
-      graduationYear: '',
-      gpa: '',
-      testScores: '',
-      extracurriculars: '',
-      workExperience: ''
-    });
+  const updatePortfolioLink = (index: number, value: string) => {
+    const newLinks = [...formData.portfolioLinks];
+    newLinks[index] = value;
+    setFormData(prev => ({
+      ...prev,
+      portfolioLinks: newLinks
+    }));
+  };
+
+  const removePortfolioLink = (index: number) => {
+    const newLinks = formData.portfolioLinks.filter((_, i) => i !== index);
+    setFormData(prev => ({
+      ...prev,
+      portfolioLinks: newLinks.length ? newLinks : ['']
+    }));
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-[#0d1117] min-h-screen text-white">
-      <h1 className="text-3xl font-bold mb-8">Customize Your Profile</h1>
-      
-      {/* Tabs */}
-      <div className="flex border-b border-gray-700 mb-8">
-        <button
-          className={`py-3 px-6 font-medium ${activeTab === 'basic' ? 'text-white border-b-2 border-blue-500' : 'text-gray-400'}`}
-          onClick={() => setActiveTab('basic')}
-        >
-          Basic Info
-        </button>
-        <button
-          className={`py-3 px-6 font-medium ${activeTab === 'college' ? 'text-white border-b-2 border-blue-500' : 'text-gray-400'}`}
-          onClick={() => setActiveTab('college')}
-        >
-          College Preferences
-        </button>
-      </div>
 
-      {activeTab === 'basic' ? (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* First Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 bg-[#1e2125] border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="First Name"
-              />
-            </div>
+        <div className="mt-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-x-5">
+            {/* Sidebar */}
+            <aside className="py-6 px-2 sm:px-6 lg:col-span-3 lg:py-0 lg:px-0">
+              <nav className="space-y-1">
+                {navigation.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={classNames(
+                        isActive
+                          ? 'bg-gray-900 text-blue-400 hover:bg-gray-800 hover:text-blue-400'
+                          : 'text-gray-300 hover:bg-gray-800 hover:text-white',
+                        'group flex items-center rounded-lg px-3 py-3 text-sm font-medium transition-colors duration-200'
+                      )}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      <span className="truncate">{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </aside>
 
-            {/* Last Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Last Name</label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 bg-[#1e2125] border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Last Name"
-              />
-            </div>
+            {/* Main content */}
+            <div className="space-y-6 sm:px-6 lg:col-span-9 lg:px-0">
+              <section aria-labelledby="profile-section">
+                <div className="shadow-lg sm:overflow-hidden sm:rounded-xl border border-gray-800">
+                  <div className="bg-gray-900 py-6 px-4 sm:p-8 rounded-xl">
+                    <h2 id="profile-section" className="text-xl font-semibold text-white">Profile</h2>
+                    
+                    <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                      {/* Username */}
+                      <div className="sm:col-span-4">
+                        <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
+                          Username
+                        </label>
+                        <div className="flex rounded-lg overflow-hidden shadow-sm">
+                          <span className="inline-flex items-center px-4 py-3 bg-gray-800 border border-r-0 border-gray-700 text-gray-300 text-sm">
+                            fliq.com/
+                          </span>
+                          <input
+                            type="text"
+                            name="username"
+                            id="username"
+                            value={formData.username}
+                            onChange={handleInputChange}
+                            className="block w-full min-w-0 flex-1 bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent px-4 py-3 text-sm rounded-r-lg transition duration-200"
+                            placeholder="yourusername"
+                          />
+                        </div>
+                      </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 bg-[#1e2125] border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Email"
-                disabled
-              />
-            </div>
+                      {/* Name */}
+                      <div className="sm:col-span-6">
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                          Name
+                        </label>
+                        <div className="mt-1">
+                          <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            className="block w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                            placeholder="Your full name"
+                          />
+                        </div>
+                        <p className="mt-2 text-sm text-gray-400">
+                          This is your public display name. It can be your real name or a pseudonym. You can only change this once every 30 days.
+                        </p>
+                      </div>
 
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Phone</label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 bg-[#1e2125] border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Phone"
-              />
-            </div>
+                      {/* Email */}
+                      <div className="sm:col-span-6">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                          Email
+                        </label>
+                        <div className="mt-1">
+                          <select
+                            id="email"
+                            name="email"
+                            className="block w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange(e as any)}
+                          >
+                            <option className="bg-gray-800">{formData.email}</option>
+                          </select>
+                        </div>
+                        <p className="mt-2 text-sm text-gray-400">
+                          Select a verified email to display
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          You can manage verified email addresses in your email settings.
+                        </p>
+                      </div>
 
-            {/* Location */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Location</label>
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 bg-[#1e2125] border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Location"
-              />
-            </div>
+                      {/* Bio */}
+                      <div className="sm:col-span-6">
+                        <label htmlFor="bio" className="block text-sm font-medium text-gray-300 mb-2">
+                          Bio
+                        </label>
+                        <div className="mt-1">
+                          <textarea
+                            id="bio"
+                            name="bio"
+                            rows={4}
+                            className="block w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                            value={formData.bio}
+                            onChange={handleInputChange}
+                            placeholder="Tell us about yourself..."
+                          />
+                        </div>
+                        <p className="mt-2 text-sm text-gray-400">
+                          Tell us who the real you. What you're building, chasing, failing at, proud of. We'll use it to find schools that actually fit you.
+                        </p>
+                      </div>
 
-            {/* Gender */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Gender</label>
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 bg-[#1e2125] border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-                <option value="prefer-not-to-say">Prefer not to say</option>
-              </select>
-            </div>
+                      {/* Portfolio Links */}
+                      <div className="sm:col-span-6">
+                        <label className="block text-sm font-medium text-gray-300">
+                          Drop Your Internet Footprint (Yes, All of It)
+                        </label>
+                        <p className="mt-1 text-sm text-gray-400 mb-4">
+                          Worked on stuff? add your portfolio links
+                        </p>
+                        
+                        <div className="mt-4 space-y-4">
+                          {formData.portfolioLinks.map((link, index) => (
+                            <div key={index} className="flex space-x-2">
+                              <input
+                                type="text"
+                                value={link}
+                                onChange={(e) => updatePortfolioLink(index, e.target.value)}
+                                className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                placeholder="https://yourportfolio.com"
+                              />
+                              {formData.portfolioLinks.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => removePortfolioLink(index)}
+                                  className="ml-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                                >
+                                  Remove
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          
+                          <div>
+                            <button
+                              type="button"
+                              onClick={addPortfolioLink}
+                              className="inline-flex items-center px-4 py-2.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 border border-gray-700"
+                            >
+                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                              Add URL
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-            {/* Date of Birth */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Date of Birth</label>
-              <input
-                type="date"
-                name="dob"
-                value={formData.dob}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 bg-[#1e2125] border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+                    <div className="mt-10 flex justify-end space-x-3">
+                      <button
+                        type="button"
+                        className="px-6 py-3 bg-transparent border-2 border-gray-700 text-white rounded-lg font-medium hover:bg-gray-800/50 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-lg hover:shadow-blue-500/20"
+                      >
+                        Update Profile
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
             </div>
           </div>
-
-          {/* Bio */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Bio</label>
-            <textarea
-              name="bio"
-              value={formData.bio}
-              onChange={handleInputChange}
-              rows={3}
-              className="w-full px-4 py-2 bg-[#1e2125] border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Tell us about yourself..."
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 pt-4">
-            <button
-              type="button"
-              onClick={resetToDefault}
-              className="px-6 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors"
-            >
-              Reset to Default
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Update My Plan
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="py-4">
-          <p className="text-gray-400">College Preferences content will go here.</p>
         </div>
-      )}
-    </div>
   );
 }

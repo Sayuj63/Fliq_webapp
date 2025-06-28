@@ -3,6 +3,12 @@
 import React from 'react';
 import Image from 'next/image';
 
+// Import local assets
+import berkeleyImage from '@/assets/2a1713375a9fcca98c14854fdc073ad10a805252.png';
+import stanfordImage from '@/assets/2fbb4b5b6b7e4ebcd6932f03130b9b1bccdebe66.png';
+import mitImage from '@/assets/3dc78f8a3d9b00e068bbcb60f94bcd32e92c9278.png';
+import caltechImage from '@/assets/5cab0d37d2daa52367d3e617b9fab9c2c9d9a064.png';
+
 const RoadmapPage = () => {
   const roadmaps = [
     {
@@ -10,28 +16,28 @@ const RoadmapPage = () => {
       university: 'University of California, Berkeley',
       progress: 67,
       pendingTasks: '2 tasks pending this week',
-      image: 'https://images.unsplash.com/photo-1541178735493-479c1a27ed24?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&q=80'
+      image: berkeleyImage
     },
     {
       id: 2,
       university: 'Stanford University',
       progress: 40,
       pendingTasks: '3 tasks pending this week',
-      image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&q=80'
+      image: stanfordImage
     },
     {
       id: 3,
       university: 'MIT',
       progress: 43,
       pendingTasks: '1 task pending this week',
-      image: 'https://images.unsplash.com/photo-1523050853548-5f4b7a2e2f6f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&q=80'
+      image: mitImage
     },
     {
       id: 4,
       university: 'Caltech',
       progress: 25,
       pendingTasks: '4 tasks pending this week',
-      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&q=80'
+      image: caltechImage
     }
   ];
 
@@ -93,58 +99,44 @@ const RoadmapPage = () => {
       </div>
 
       {/* Roadmap Cards */}
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-4">
         {roadmaps.map((roadmap) => (
-          <div key={roadmap.id} className="bg-[#161B22] rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
-            <div className="flex-1 order-2 sm:order-1">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <span className="text-xs uppercase tracking-wider text-[#9CA3AF] block">Roadmap</span>
-                  <h3 className="text-white text-base sm:text-lg font-semibold mt-0.5 line-clamp-2">{roadmap.university}</h3>
-                </div>
-                {/* University logo/image on mobile */}
-                <div className="sm:hidden w-16 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                  <Image
-                    src={roadmap.image}
-                    alt={roadmap.university}
-                    className="w-full h-full object-cover"
-                    fill
-                    sizes="(max-width: 640px) 100vw, 33vw"
-                    style={{ objectFit: 'cover' }}
-                  />
-                </div>
+          <div key={roadmap.id} className="bg-[#161B22] rounded-xl p-4 flex gap-4">
+            {/* 1:1 Image on the left */}
+            <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden">
+              <Image
+                src={roadmap.image}
+                alt={roadmap.university}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 96px, 128px"
+                priority
+              />
+            </div>
+            
+            {/* Content on the right */}
+            <div className="flex-1 flex flex-col">
+              <div className="mb-2">
+                <h3 className="text-white text-base sm:text-lg font-medium">{roadmap.university}</h3>
+                <p className="text-[#9CA3AF] text-sm mt-0.5">You have {roadmap.pendingTasks}</p>
               </div>
               
-              <p className="text-[#9CA3AF] text-sm mt-2">You have {roadmap.pendingTasks}</p>
-              
-              <div className="mt-4">
+              <div className="mt-auto">
                 <div className="flex justify-between text-xs sm:text-sm mb-1">
                   <span className="text-[#9CA3AF]">Progress</span>
                   <span className="text-[#E5E7EB] font-medium">{roadmap.progress}%</span>
                 </div>
-                <div className="w-full bg-[#2D3748] rounded-full h-1.5 sm:h-2">
+                <div className="w-full bg-[#2D3748] rounded-full h-1.5 sm:h-2 mb-3">
                   <div 
                     className="bg-blue-500 h-full rounded-full transition-all duration-300" 
                     style={{ width: `${roadmap.progress}%` }}
                   ></div>
                 </div>
+                
+                <button className="w-full bg-[#1F6FEB] hover:bg-blue-600 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors">
+                  View Roadmap
+                </button>
               </div>
-              
-              <button className="mt-4 w-full sm:w-auto bg-[#1F6FEB] hover:bg-blue-600 text-white text-sm font-medium rounded-full px-4 py-2 transition-colors">
-                View Roadmap
-              </button>
-            </div>
-            
-            {/* University logo/image on desktop */}
-            <div className="hidden sm:block w-32 h-24 rounded-lg overflow-hidden flex-shrink-0 order-1 sm:order-2">
-              <Image
-                src={roadmap.image}
-                alt={roadmap.university}
-                className="w-full h-full object-cover"
-                fill
-                sizes="(max-width: 640px) 100vw, 33vw"
-                style={{ objectFit: 'cover' }}
-              />
             </div>
           </div>
         ))}

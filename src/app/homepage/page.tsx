@@ -36,6 +36,7 @@ interface CollegeCardProps {
   match: string;
   isPremium?: boolean;
   imageUrl: StaticImageData;
+  type?: 'Target' | 'Safety' | 'Reach';
 }
 
 interface CollegeInfoCardProps {
@@ -48,49 +49,107 @@ interface CollegeInfoCardProps {
 const CollegeInfoCard: React.FC<CollegeInfoCardProps> = ({ name, match, type, imageUrl }) => (
   <div className="flex flex-col w-56 flex-shrink-0">
     {/* Image */}
-    <div className="bg-gray-700 rounded-lg h-28 mb-2 overflow-hidden flex items-center justify-center">
+    <div className="bg-gray-900 rounded-lg h-28 mb-2 overflow-hidden flex items-center justify-center">
       <Image src={imageUrl} alt={name} className="object-cover w-full h-full" width={224} height={112} />
     </div>
     <h3 className="text-white font-medium text-sm truncate">{name}</h3>
     <p className="text-gray-400 text-xs">
-      Match: {match}, <span className={type === 'Target' ? 'text-yellow-400' : type === 'Safety' ? 'text-green-400' : 'text-red-400'}>{type}</span>
+      Match: {match}, <span className={type === 'Target' ? 'text-white' : type === 'Safety' ? 'text-white' : 'text-white'}>{type}</span>
     </p>
   </div>
 );
 
-const CollegeCard: React.FC<CollegeCardProps> = ({ name, rank, match, imageUrl }) => (
-  <div className="w-64 flex-shrink-0 overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-    {/* Image */}
-    <div className="h-32 w-full bg-gray-700 flex items-center justify-center text-gray-400">
-      <Image src={imageUrl} alt={name} className="object-cover w-full h-full" width={256} height={128} />
+const CollegeCard: React.FC<CollegeCardProps> = ({ name, rank, match, imageUrl, type = 'Target' }) => (
+  <div className="w-64 flex-shrink-0 overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-black border border-gray-800">
+    {/* College Image */}
+    <div className="h-40 w-full bg-gray-900 flex items-center justify-center overflow-hidden">
+      <Image 
+        src={imageUrl} 
+        alt={name} 
+        className="object-cover w-full h-full"
+        width={256}
+        height={160}
+      />
     </div>
-    {/* Box only around text and button */}
-    <div className="bg-[#1e2125] p-4">
-      <h3 className="text-white font-medium text-base truncate">{name}</h3>
-      <div className="flex justify-between items-center mt-1">
-        <p className="text-gray-400 text-sm">{rank}</p>
-        <p className="text-blue-400 text-sm font-medium">Match: {match}</p>
+    
+    {/* College Info */}
+    <div className="p-4">
+      <div className="flex justify-between items-start mb-1">
+        <div className="flex items-center">
+          <span className="text-xl font-bold text-white">{match.replace('%', '')}</span>
+          <span className="text-xs text-gray-400 ml-0.5">%</span>
+          <span className="text-xs text-gray-400 ml-0.5">match</span>
+        </div>
+        <div className="text-gray-400 hover:text-white transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
+          </svg>
+        </div>
       </div>
-      <button className="mt-3 w-full bg-[#293039] hover:bg-[#334155] text-white py-2.5 rounded-full text-sm font-medium transition-colors">
-        View Roadmap
-      </button>
+      
+      <h3 className="text-white font-medium text-sm mb-1 line-clamp-2" style={{ height: '2.25rem' }}>{name}</h3>
+      
+      <div className="flex justify-between items-center mt-1">
+        <p className="text-gray-400 text-xs">{rank}</p>
+        {type !== 'Safety' && (
+          <span className={`text-[10px] font-medium ${
+            type === 'Target' ? 'text-yellow-400' : 'text-gray-400'
+          }`}>
+            {type}
+          </span>
+        )}
+      </div>
     </div>
   </div>
 );
 
+// List of top 10 colleges for the dropdown
+const topColleges = [
+  'Massachusetts Institute of Technology (MIT)',
+  'Stanford University',
+  'Harvard University',
+  'California Institute of Technology (Caltech)',
+  'University of Oxford',
+  'ETH Zurich',
+  'University of Cambridge',
+  'Imperial College London',
+  'University of Chicago',
+  'University of Pennsylvania'
+];
+
 const HomePage: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [filteredColleges, setFilteredColleges] = useState<string[]>(topColleges);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    setFilteredColleges(
+      topColleges.filter(college => 
+        college.toLowerCase().includes(query.toLowerCase())
+      )
+    );
+    setShowDropdown(true);
+  };
+
+  const handleCollegeSelect = (college: string) => {
+    setSearchQuery(college);
+    setShowDropdown(false);
+    // Here you can add navigation or other actions when a college is selected
+  };
   console.log('HomePage component rendered');
   const recommendedColleges = [
-    { name: 'Stanford University', rank: 'QS Ranking: 5', match: '95%' },
-    { name: 'Harvard University', rank: 'QS Ranking: 4', match: '92%' },
-    { name: 'MIT', rank: 'QS Ranking: 1', match: '90%' },
-    { name: 'Caltech', rank: 'QS Ranking: 2', match: '88%' },
-    { name: 'University of Oxford', rank: 'QS Ranking: 3', match: '85%' },
-    { name: 'ETH Zurich', rank: 'QS Ranking: 7', match: '82%' },
-    { name: 'University of Cambridge', rank: 'QS Ranking: 6', match: '80%' },
-    { name: 'Imperial College London', rank: 'QS Ranking: 8', match: '78%' },
-    { name: 'UCL', rank: 'QS Ranking: 9', match: '75%' },
-    { name: 'University of Chicago', rank: 'QS Ranking: 10', match: '72%' },
+    { name: 'Stanford University', rank: 'QS: 5', match: '95%', type: 'Target' as const },
+    { name: 'Harvard University', rank: 'QS: 4', match: '92%', type: 'Target' as const },
+    { name: 'MIT', rank: 'QS: 1', match: '90%', type: 'Reach' as const },
+    { name: 'Caltech', rank: 'QS: 2', match: '88%', type: 'Reach' as const },
+    { name: 'University of Oxford', rank: 'QS: 3', match: '85%', type: 'Target' as const },
+    { name: 'ETH Zurich', rank: 'QS: 7', match: '82%', type: 'Reach' as const },
+    { name: 'University of Cambridge', rank: 'QS: 6', match: '80%', type: 'Target' as const },
+    { name: 'Imperial College London', rank: 'QS: 8', match: '78%', type: 'Target' as const },
+    { name: 'UCL', rank: 'QS: 9', match: '75%', type: 'Reach' as const },
+    { name: 'University of Chicago', rank: 'QS: 10', match: '72%', type: 'Reach' as const },
   ];
 
   const targetSafetyColleges: Array<{name: string, match: string, type: 'Target' | 'Safety' | 'Reach'}> = [
@@ -117,70 +176,103 @@ const HomePage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-white">
-    
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Recommended Colleges */}
-        <section className="mb-12">
-          <div className="mb-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold text-white">Smart matches</h2>
-              <div className="relative group">
-                <button 
-                  className="text-gray-400 hover:text-white transition-colors"
-                  aria-label="How these matches are built"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-                  </svg>
-                </button>
-                <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-gray-800 text-white text-sm rounded-lg shadow-lg p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <h3 className="font-bold text-white mb-2">How These Matches Are Built</h3>
-                  <p className="text-gray-300">
-                    We use your GPA, intended major, financial preferences, and 40+ personal signals to generate a ranked match list using verified admit data from real universities and 5,000+ successful applications. These aren't guesses — they're strategy-backed insights.
-                  </p>
-                </div>
-              </div>
+    <div className="min-h-screen bg-black text-white">
+      {/* Search Section */}
+      <section className="py-16 px-4 flex flex-col items-center justify-center bg-black">
+        <h2 className="text-3xl md:text-4xl font-light text-gray-200 mb-8 text-center">
+          explore your dream college
+        </h2>
+        <div className="relative w-full max-w-2xl">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onFocus={() => setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+              placeholder="type a college name to search"
+              className="w-full bg-gray-900 text-white rounded-full py-4 pl-6 pr-14 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </div>
-            <p className="text-gray-300 text-sm mt-1">
-              Backed by 5,000+ successful applications and real admit data — Fliq builds your list using verified university insights, not just random rankings.
+          </div>
+          
+          {/* Dropdown */}
+          {showDropdown && filteredColleges.length > 0 && (
+            <div className="absolute z-10 mt-1 w-full bg-gray-900 rounded-lg shadow-lg border border-gray-700 max-h-60 overflow-auto">
+              {filteredColleges.map((college, index) => (
+                <div
+                  key={index}
+                  className="px-4 py-3 hover:bg-gray-800 cursor-pointer"
+                  onMouseDown={() => handleCollegeSelect(college)}
+                >
+                  <p className="text-white">{college}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <main className="container mx-auto px-4 py-8 bg-black">
+        {/* Smart Matches Section */}
+        <section className="mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <h2 className="text-3xl font-bold text-white mb-4">Your Smart Matches</h2>
+            <p className="text-gray-300 text-lg">
+              Handpicked based on your academics, goals, and what you value most
             </p>
           </div>
+          
           <div className="relative">
-            <div className="flex space-x-4 pb-4 overflow-x-auto scrollbar-hide">
+            <div className="flex space-x-6 pb-8 overflow-x-auto scrollbar-hide px-2">
               {recommendedColleges.map((college, index) => {
-  const randomImage = images[Math.floor(Math.random() * images.length)];
-  return (
-    <div key={index} className="flex-shrink-0">
-      <CollegeCard {...college} imageUrl={randomImage} />
-    </div>
-  );
-})}
+                const randomImage = images[Math.floor(Math.random() * images.length)];
+                return (
+                  <div key={index} className="flex-shrink-0">
+                    <CollegeCard {...college} imageUrl={randomImage} />
+                  </div>
+                );
+              })}
             </div>
-            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-r from-transparent to-[#0d1117] pointer-events-none"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-r from-transparent to-black pointer-events-none"></div>
           </div>
         </section>
 
         {/* Target & Safety Schools */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-4">Target & Safety Schools</h2>
+        <section className="mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <h2 className="text-3xl font-bold text-white mb-4">Your Safe Bets & Solid Shots</h2>
+            <p className="text-gray-300 text-lg">
+              Balanced picks where your profile stands strong — and where admits are likely
+            </p>
+          </div>
           <div className="relative">
-            <div className="flex space-x-8 pb-4 overflow-x-auto scrollbar-hide px-4">
+            <div className="flex space-x-4 pb-4 overflow-x-auto scrollbar-hide px-2">
               {targetSafetyColleges.map((college, index) => {
-  const randomImage = images[Math.floor(Math.random() * images.length)];
-  return (
-    <CollegeInfoCard key={index} {...college} imageUrl={randomImage} />
-  );
-})}
+                const randomImage = images[Math.floor(Math.random() * images.length)];
+                return (
+                  <div key={index} className="flex-shrink-0">
+                    <CollegeInfoCard {...college} imageUrl={randomImage} />
+                  </div>
+                );
+              })}
             </div>
-            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-r from-transparent to-[#0d1117] pointer-events-none"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-r from-transparent to-black pointer-events-none"></div>
           </div>
         </section>
 
         {/* Reach Colleges (Premium) */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-4">Reach Colleges (Premium)</h2>
+        <section className="mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <h2 className="text-3xl font-bold text-white mb-4">Out of Reach? Not Anymore</h2>
+            <p className="text-gray-300 text-lg">
+              These schools look tough — until you see how people just like you got in.
+            </p>
+          </div>
           <div className="flex flex-row flex-nowrap gap-6 w-full overflow-x-auto scrollbar-hide pb-2" style={{WebkitOverflowScrolling: 'touch'}}>
             {[
               {
@@ -240,38 +332,36 @@ const HomePage: React.FC = () => {
             })}
           </div>
         </section>
+        <section className="mb-16 w-full">
+          <div className="w-full bg-black border border-gray-800 rounded-2xl p-8">
+            <div className="flex justify-between items-start mb-6">
+              <h2 className="text-3xl font-bold text-white">Explore fliq+</h2>
+              <button className="bg-white text-black font-medium px-6 py-3 rounded-full hover:bg-gray-100 transition-colors">
+                Unlock Playbook
+              </button>
+            </div>
+            <div className="pt-4 border-t border-gray-800">
+              <p className="text-xl text-gray-300 mb-2">
+                How they got in (when no one thought they would)
+              </p>
+              <p className="text-gray-400 text-sm">
+                Get exact steps, strategies and timelines from current admits who had a profile like yours
+              </p>
+            </div>
+          </div>
+        </section>
 
         {/* Explore More Colleges */}
         <section className="mb-12">
           <div className="flex flex-col gap-6">
-            <h2 className="text-2xl font-bold text-white mb-4">Explore More Colleges</h2>
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <h2 className="text-3xl font-bold text-white mb-4">Just Outside Your Comfort Zone</h2>
+            <p className="text-gray-300 text-lg">
+            These schools said yes to students just like you
+            </p>
+          </div>
+          
             
-            <div className="flex flex-wrap items-center gap-2">
-              <select className="bg-[#1e2125] text-white text-xs rounded-full px-4 py-1.5 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent h-8">
-                <option value="">Country</option>
-                <option value="us">United States</option>
-                <option value="uk">United Kingdom</option>
-                <option value="ca">Canada</option>
-              </select>
-              
-              <select className="bg-[#1e2125] text-white text-xs rounded-full px-4 py-1.5 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent h-8">
-                <option value="">Major</option>
-                <option value="cs">Computer Science</option>
-                <option value="eng">Engineering</option>
-              </select>
-              
-              <select className="bg-[#1e2125] text-white text-xs rounded-full px-4 py-1.5 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent h-8">
-                <option value="">Ranking</option>
-                <option value="top50">Top 50</option>
-                <option value="top100">Top 100</option>
-              </select>
-              
-              <select className="bg-[#1e2125] text-white text-xs rounded-full px-4 py-1.5 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent h-8">
-                <option value="">Budget</option>
-                <option value="lt20k">Under $20k</option>
-                <option value="20k-40k">$20k - $40k</option>
-              </select>
-            </div>
           </div>
           <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-6 px-4">
             {moreColleges.map((college, index) => {
@@ -287,6 +377,8 @@ const HomePage: React.FC = () => {
 })}
           </div>
         </section>
+
+
       </main>
     </div>
   );
